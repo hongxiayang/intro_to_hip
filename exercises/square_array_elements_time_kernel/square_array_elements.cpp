@@ -45,7 +45,9 @@ int main()
     // Create start/stop event objects and variable for elapsed time in ms
     hipEvent_t start, stop;
     // TODO: Create start event
+    gpuErrorCheck( hipEventCreate(&start) );
     // TODO: Create stop event
+    gpuErrorCheck( hipEventCreate(&stop) );
     float elapsed_time_ms;
 
     // Initialize host arrays A and A_squared
@@ -68,7 +70,7 @@ int main()
        Start timing GPU kernel
     ================================================= */
     // TODO: Add start event into GPU stream
-
+    gpuErrorCheck( hipEventRecord(start, NULL) );
     // Launch kernel
     hipLaunchKernelGGL(square_array_elements, blk_in_grid, thr_per_blk , 0, 0, d_A);
 
@@ -76,12 +78,17 @@ int main()
     gpuErrorCheck( hipGetLastError() );
 
     // TODO: Add stop event into GPU stream
+    gpuErrorCheck( hipEventRecord(stop, NULL) );
+
     gpuErrorCheck( hipEventSynchronize(stop) );
     gpuErrorCheck( hipEventElapsedTime(&elapsed_time_ms, start, stop) );
     /* =================================================
        Stop timing GPU kernel
     ================================================= */
 
+    gpuErrorCheck( hipEventDestroy(start) );
+    gpuErrorCheck( hipEventDestroy(stop) );
+    
     // Check for asynchronous errors during GPU execution (after control is returned to CPU)
     gpuErrorCheck( hipDeviceSynchronize() );
 
