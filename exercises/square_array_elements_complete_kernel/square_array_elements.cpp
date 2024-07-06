@@ -22,6 +22,9 @@ __global__ void square_array_elements(double *a)
     int id = blockDim.x * blockIdx.x + threadIdx.x;
 
     // TODO: Add in code to square the array elements
+    if (id < N) {
+        a[id] *= a[id];
+    }
 }
 
 // Main program
@@ -75,7 +78,7 @@ int main()
         {
             printf("A[%d] = %f instread of %f\n", i, A_squared[i], A[i] * A[i]);
             printf("Exiting...\n");
-            exit(1);
+            exit(1); // this will have memory leak since the device memory is not freed. Move this after hipFree and change this line to "break;"
         }
     }
 
